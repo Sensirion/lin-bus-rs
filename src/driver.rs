@@ -1,5 +1,4 @@
 ///! Trait for a hardware driver to implement
-
 pub use Error;
 
 pub trait Master {
@@ -9,5 +8,3 @@ pub trait Master {
     fn read(&mut self, buf: &mut [u8]) -> Result<(), Self::Error>;
     fn write(&mut self, data: &[u8]) -> Result<(), Self::Error>;
 }
-
-

@@ -23,7 +23,7 @@ where
         self.write(data)
     }
 
-    fn read_frame(&mut self, pid: u8, buf: &mut[u8]) -> Result<(), Driver::Error> {
+    fn read_frame(&mut self, pid: u8, buf: &mut [u8]) -> Result<(), Driver::Error> {
         self.send_header(pid)?;
         self.read(buf)
     }
