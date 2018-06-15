@@ -10,7 +10,6 @@ pub enum Error {
     Checksum,
 }
 
-
 #[cfg(test)]
 mod tests {
     #[test]
