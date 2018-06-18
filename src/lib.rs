@@ -1,5 +1,5 @@
 pub mod driver;
-mod master;
+pub mod master;
 
 pub use master::Master;
 
