@@ -5,7 +5,7 @@ use driver;
 pub trait Master {
     type Error;
     fn send_wakeup(&mut self) -> Result<(), Self::Error>;
-    fn write_frame(&mut self, pid: u8, data: &[u8]) -> Result<(), Self::Error>;
+    fn write_frame(&mut self, frame: &Frame) -> Result<(), Self::Error>;
     fn read_frame(&mut self, pid: u8, data: &mut [u8]) -> Result<(), Self::Error>;
 }
 
@@ -61,9 +61,9 @@ where
         Driver::send_wakeup(self)
     }
 
-    fn write_frame(&mut self, pid: u8, data: &[u8]) -> Result<(), Driver::Error> {
-        self.send_header(pid)?;
-        self.write(data)
+    fn write_frame(&mut self, frame: &Frame) -> Result<(), Driver::Error> {
+        self.send_header(frame.get_pid())?;
+        self.write(frame.get_data_with_checksum())
     }
 
     fn read_frame(&mut self, pid: u8, buf: &mut [u8]) -> Result<(), Driver::Error> {
