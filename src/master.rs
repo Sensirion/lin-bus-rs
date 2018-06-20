@@ -6,7 +6,7 @@ pub trait Master {
     type Error;
     fn send_wakeup(&mut self) -> Result<(), Self::Error>;
     fn write_frame(&mut self, frame: &Frame) -> Result<(), Self::Error>;
-    fn read_frame(&mut self, pid: u8, data: &mut [u8]) -> Result<(), Self::Error>;
+    fn read_frame(&mut self, pid: u8, data_lengh: usize) -> Result<Frame, Self::Error>;
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -66,9 +66,22 @@ where
         self.write(frame.get_data_with_checksum())
     }
 
-    fn read_frame(&mut self, pid: u8, buf: &mut [u8]) -> Result<(), Driver::Error> {
+    fn read_frame(&mut self, pid: u8, data_length: usize) -> Result<Frame, Driver::Error> {
+        assert!(data_length <= 8, "Maximum data length is 8 bytes");
         self.send_header(pid)?;
-        self.read(buf)
+        let mut frame = Frame {
+            pid: pid,
+            data_length: data_length,
+            buffer: [0u8; 9],
+        };
+        self.read(&mut frame.buffer[0..=data_length])?;
+
+        let checksum = checksum(pid, &frame.buffer[0..data_length]);
+        if checksum != frame.buffer[data_length] {
+            Err(Driver::Error::from(driver::Error::Checksum))
+        } else {
+            Ok(frame)
+        }
     }
 }
 
