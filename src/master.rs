@@ -1,24 +1,25 @@
 ///! LIN bus master implementation
 use checksum;
 use driver;
+use PID;
 
 pub trait Master {
     type Error;
     fn send_wakeup(&mut self) -> Result<(), Self::Error>;
     fn write_frame(&mut self, frame: &Frame) -> Result<(), Self::Error>;
-    fn read_frame(&mut self, pid: u8, data_lengh: usize) -> Result<Frame, Self::Error>;
+    fn read_frame(&mut self, pid: PID, data_lengh: usize) -> Result<Frame, Self::Error>;
 }
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct Frame {
-    pid: u8,
+    pid: PID,
     buffer: [u8; 9],
     data_length: usize,
 }
 
 impl Frame {
     /// Creates a LIN frame from the PID and data. Calculates and adds checksum accordingly
-    pub fn from_data(pid: u8, data: &[u8]) -> Frame {
+    pub fn from_data(pid: PID, data: &[u8]) -> Frame {
         assert!(data.len() <= 8, "Maximum data is 8 bytes");
         let mut buffer = [0u8; 9];
         buffer[0..data.len()].clone_from_slice(data);
@@ -41,7 +42,7 @@ impl Frame {
     }
 
     /// Get the PID from the frame
-    pub fn get_pid(&self) -> u8 {
+    pub fn get_pid(&self) -> PID {
         self.pid
     }
 
@@ -66,7 +67,7 @@ where
         self.write(frame.get_data_with_checksum())
     }
 
-    fn read_frame(&mut self, pid: u8, data_length: usize) -> Result<Frame, Driver::Error> {
+    fn read_frame(&mut self, pid: PID, data_length: usize) -> Result<Frame, Driver::Error> {
         assert!(data_length <= 8, "Maximum data length is 8 bytes");
         self.send_header(pid)?;
         let mut frame = Frame {
@@ -90,17 +91,17 @@ mod tests {
     use super::*;
 
     struct FrameTestData<'a> {
-        pid: u8,
+        pid: PID,
         data: &'a [u8],
         frame: Frame,
     }
     #[test]
     fn test_frame_from_data() {
         let test_data = [FrameTestData {
-            pid: 0xDD,
+            pid: PID(0xDD),
             data: &[0x01],
             frame: Frame {
-                pid: 0xDD,
+                pid: PID(0xDD),
                 buffer: [0x01, 0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
                 data_length: 1,
             },
