@@ -1,4 +1,8 @@
 #![no_std]
+extern crate bitfield;
+extern crate byteorder;
+extern crate num_traits;
+
 pub mod driver;
 pub mod master;
 

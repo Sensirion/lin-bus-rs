@@ -1,6 +1,10 @@
+use bitfield::BitRange;
+use byteorder::{ByteOrder, LittleEndian};
 ///! LIN bus master implementation
 use checksum;
+use core::mem::size_of;
 use driver;
+use num_traits::{PrimInt, Unsigned};
 use PID;
 
 pub trait Master {
@@ -34,6 +38,22 @@ impl Frame {
     /// Access the data from the frame
     pub fn get_data(&self) -> &[u8] {
         &self.buffer[0..self.data_length]
+    }
+
+    /// Decode frame data
+    pub fn decode<T>(&self, offset: usize, length: usize) -> T
+    where
+        T: PrimInt + Unsigned,
+        u64: BitRange<T>,
+    {
+        assert!(
+            (offset + length) < self.data_length * 8,
+            "Not enough data available"
+        );
+        assert!(length <= size_of::<T>() * 8, "Output type not big enough");
+
+        let num = LittleEndian::read_u64(&self.buffer[0..8]);
+        num.bit_range(offset + length - 1, offset)
     }
 
     /// Get the checksum from the frame
@@ -112,6 +132,26 @@ mod tests {
             assert_eq!(frame.get_data(), d.data);
             assert_eq!(frame.get_pid(), d.pid);
             assert_eq!(frame.get_data_with_checksum().len(), d.data.len() + 1);
+        }
+    }
+
+    #[test]
+    fn test_data_decode() {
+        let test_data = [
+            (
+                Frame::from_data(PID(0), &[254, 251, 239, 255]),
+                [1022, 1022, 2046],
+            ),
+            (Frame::from_data(PID(0), &[3, 12, 240, 182]), [3, 3, 879]),
+            (Frame::from_data(PID(0), &[3, 12, 0, 183]), [3, 3, 880]),
+            (Frame::from_data(PID(0), &[2, 12, 240, 182]), [2, 3, 879]),
+            (Frame::from_data(PID(0), &[2, 8, 0, 183]), [2, 2, 880]),
+        ];
+
+        for d in &test_data {
+            assert_eq!(d.0.decode::<u16>(0, 10), d.1[0]);
+            assert_eq!(d.0.decode::<u16>(10, 10), d.1[1]);
+            assert_eq!(d.0.decode::<u16>(20, 11), d.1[2]);
         }
     }
 }
