@@ -7,6 +7,7 @@ readme = "README.md"
 keywords = ["LIN", "local", "interconnect", "network"]
 categories = ["no-std", "hardware-support"]
 license = "BSD-3-Clause"
+repository = "https://github.com/Sensirion/lin-bus-rs"
 
 [dependencies]
 bitfield = "^0.13"
