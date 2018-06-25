@@ -2,6 +2,11 @@
 name = "lin-bus"
 version = "0.1.0"
 authors = ["Raphael Nestler <raphael.nestler@sensirion.com>"]
+description = "LIN bus driver traits and protocol implementation"
+readme = "README.md"
+keywords = ["LIN", "Local Interconnect Network"]
+categories = ["no-std", "hardware-support"]
+license = "BSD-3-Clause"
 
 [dependencies]
 bitfield = "^0.13"
