@@ -4,6 +4,8 @@ This project follows [semantic versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.1] (2018-07-04)
+
  * changed: Derive Copy, Clone, PartialEq and Eq for Error enum
    ([#11](https://github.com/Sensirion/lin-bus-rs/pull/11))
 
@@ -11,4 +13,5 @@ This project follows [semantic versioning](https://semver.org/).
 
  * First crates.io release
 
-[Unreleased]: https://github.com/Sensirion/lin-bus-rs/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Sensirion/lin-bus-rs/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/Sensirion/lin-bus-rs/compare/v0.1.0...v0.1.1
