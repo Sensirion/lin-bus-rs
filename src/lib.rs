@@ -8,7 +8,7 @@ pub mod master;
 
 pub use master::Master;
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Error {
     Timeout,
     PhysicalBus,
