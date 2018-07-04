@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/Sensirion/lin-bus-rs.svg?style=shield)](https://circleci.com/gh/Sensirion/lin-bus-rs)
 # lin-bus-rs
 
 LIN bus driver traits and protocol implementation of the [2.2A specification].
