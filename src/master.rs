@@ -1,11 +1,11 @@
+///! LIN bus master implementation
+use crate::checksum;
+use crate::driver;
+use crate::PID;
 use bitfield::BitRange;
 use byteorder::{ByteOrder, LittleEndian};
-///! LIN bus master implementation
-use checksum;
 use core::mem::size_of;
-use driver;
 use num_traits::{PrimInt, Unsigned};
-use PID;
 
 pub trait Master {
     type Error;

@@ -6,7 +6,7 @@ extern crate num_traits;
 pub mod driver;
 pub mod master;
 
-pub use master::Master;
+pub use crate::master::Master;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Error {
