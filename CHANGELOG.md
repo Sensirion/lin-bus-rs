@@ -4,6 +4,9 @@ This project follows [semantic versioning](https://semver.org/).
 
 ## [Unreleased]
 
+ * changed: Use Rust 2018 edition syntax
+   ([#13](https://github.com/Sensirion/lin-bus-rs/pull/13))
+
 ## [0.1.1] (2018-07-04)
 
  * changed: Derive Copy, Clone, PartialEq and Eq for Error enum
