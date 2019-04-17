@@ -35,11 +35,22 @@ impl PID {
     pub fn get(&self) -> u8 {
         self.0
     }
+
+    /// Return the contained ID
+    pub fn get_id(&self) -> u8 {
+        self.0 & 0b0011_1111
+    }
+
+    /// Return if the associated frame uses the classic checksum (diagnostic IDs 60 and 61 or
+    /// special use IDs 62, 63)
+    pub fn uses_classic_checksum(&self) -> bool {
+        self.get_id() >= 60
+    }
 }
 
-/// Calculate the LIN checksum. It is defined as "The inverted eight bit sum with carry. Eight bit
-/// sum with carry is equivalent to sum all values and subtract 255 every time the sum is greater
-/// or equal to 256"
+/// Calculate the LIN V2.1 "enhanced" checksum. It is defined as "The inverted eight bit sum with
+/// carry. Eight bit sum with carry is equivalent to sum all values and subtract 255 every time the
+/// sum is greater or equal to 256"
 pub fn checksum(pid: PID, data: &[u8]) -> u8 {
     let sum = data.iter().fold(pid.0 as u16, |sum, v| {
         let sum = sum + *v as u16;
@@ -52,8 +63,8 @@ pub fn checksum(pid: PID, data: &[u8]) -> u8 {
     !(sum as u8)
 }
 
-/// Calculate the classic checksum. It is defined as "Checksum calculation over the data bytes only
-/// is called classic checksum"
+/// Calculate the LIN V1.3 "classic" checksum. It is defined as "Checksum calculation over the data
+/// bytes only"
 pub fn classic_checksum(data: &[u8]) -> u8 {
     checksum(PID(0u8), data)
 }
@@ -67,8 +78,9 @@ mod tests {
         data: &'a [u8],
         checksum: u8,
     }
+
     #[test]
-    fn test_checksum() {
+    fn test_enhanced_checksum() {
         let test_data = [
             CheckSumTestData {
                 pid: PID(0xDD),
@@ -92,6 +104,30 @@ mod tests {
     }
 
     #[test]
+    fn test_classic_checksum() {
+        let test_data = [
+            CheckSumTestData {
+                pid: PID::from_id(0x3C),
+                data: &[0x01],
+                checksum: 0xFE,
+            },
+            CheckSumTestData {
+                pid: PID::from_id(0x3D),
+                data: &[0x01],
+                checksum: 0xFE,
+            },
+            CheckSumTestData {
+                pid: PID::from_id(0x3d),
+                data: &[0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08],
+                checksum: 0xDB,
+            },
+        ];
+        for d in &test_data {
+            assert_eq!(d.checksum, classic_checksum(d.data));
+        }
+    }
+
+    #[test]
     fn test_pid_from_id() {
         let test_data = [
             (0, PID(0x80)),
@@ -103,7 +139,18 @@ mod tests {
         ];
 
         for d in &test_data {
-            assert_eq!(PID::from_id(d.0), d.1);
+            let pid = PID::from_id(d.0);
+            assert_eq!(pid, d.1);
+            assert_eq!(pid.get_id(), d.0);
+        }
+    }
+
+    #[test]
+    fn test_id_uses_classic_checksum() {
+        let test_ids: &[u8] = &[0, 1, 59, 60, 63];
+
+        for i in test_ids {
+            assert_eq!(PID::from_id(*i).uses_classic_checksum(), *i >= 60);
         }
     }
 

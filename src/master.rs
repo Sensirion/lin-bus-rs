@@ -1,7 +1,7 @@
 ///! LIN bus master implementation
-use crate::checksum;
 use crate::driver;
 use crate::PID;
+use crate::{checksum, classic_checksum};
 use bitfield::BitRange;
 use byteorder::{ByteOrder, LittleEndian};
 use core::mem::size_of;
@@ -27,10 +27,16 @@ impl Frame {
         assert!(data.len() <= 8, "Maximum data is 8 bytes");
         let mut buffer = [0u8; 9];
         buffer[0..data.len()].clone_from_slice(data);
-        buffer[data.len()] = checksum(pid, &buffer[0..data.len()]);
+        buffer[data.len()] = {
+            if pid.uses_classic_checksum() {
+                classic_checksum(&buffer[0..data.len()])
+            } else {
+                checksum(pid, &buffer[0..data.len()])
+            }
+        };
         Frame {
-            pid: pid,
-            buffer: buffer,
+            pid,
+            buffer,
             data_length: data.len(),
         }
     }
@@ -97,7 +103,13 @@ where
         };
         self.read(&mut frame.buffer[0..=data_length])?;
 
-        let checksum = checksum(pid, &frame.buffer[0..data_length]);
+        let checksum = {
+            if pid.uses_classic_checksum() {
+                classic_checksum(&frame.buffer[0..data_length])
+            } else {
+                checksum(pid, &frame.buffer[0..data_length])
+            }
+        };
         if checksum != frame.buffer[data_length] {
             Err(Driver::Error::from(driver::Error::Checksum))
         } else {
