@@ -4,8 +4,12 @@ This project follows [semantic versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] (2019-04-18)
+
  * changed: Use Rust 2018 edition syntax
    ([#13](https://github.com/Sensirion/lin-bus-rs/pull/13))
+ * changed: Use classic checksum on special frames. Adds
+   `PID::uses_classic_checksum` and `PID::get_id`.
 
 ## [0.1.1] (2018-07-04)
 
@@ -16,5 +20,6 @@ This project follows [semantic versioning](https://semver.org/).
 
  * First crates.io release
 
-[Unreleased]: https://github.com/Sensirion/lin-bus-rs/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/Sensirion/lin-bus-rs/compare/v0.2.0...HEAD
+[0.1.2]: https://github.com/Sensirion/lin-bus-rs/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/Sensirion/lin-bus-rs/compare/v0.1.0...v0.1.1
