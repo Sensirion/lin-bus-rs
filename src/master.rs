@@ -53,7 +53,7 @@ impl Frame {
         u64: BitRange<T>,
     {
         assert!(
-            (offset + length) < self.data_length * 8,
+            (offset + length) <= self.data_length * 8,
             "Not enough data available"
         );
         assert!(length <= size_of::<T>() * 8, "Output type not big enough");
