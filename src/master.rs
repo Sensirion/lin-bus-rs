@@ -166,4 +166,10 @@ mod tests {
             assert_eq!(d.0.decode::<u16>(20, 11), d.1[2]);
         }
     }
+
+    #[test]
+    fn test_data_decode_all_bits() {
+        let frame = Frame::from_data(PID(0), &[0x55, 0xDD]);
+        assert_eq!(frame.decode::<u16>(0, 16), 0xdd55);
+    }
 }
