@@ -1,7 +1,4 @@
 #![no_std]
-extern crate bitfield;
-extern crate byteorder;
-extern crate num_traits;
 
 pub mod driver;
 pub mod master;
@@ -26,24 +23,24 @@ impl PID {
     pub fn from_id(id: u8) -> PID {
         assert!(id < 64, "ID must be less than 64");
         // count parity bits and check if they are even odd
-        let p0 = (id & 0b10111).count_ones() as u8 & 0b1;
-        let p1 = ((id & 0b111010).count_ones() as u8 + 1) & 0b1;
+        let p0 = (id & 0b1_0111).count_ones() as u8 & 0b1;
+        let p1 = ((id & 0b11_1010).count_ones() as u8 + 1) & 0b1;
         PID(id | (p0 << 6u8) | (p1 << 7u8))
     }
 
     /// Return the contained PID
-    pub fn get(&self) -> u8 {
+    pub fn get(self) -> u8 {
         self.0
     }
 
     /// Return the contained ID
-    pub fn get_id(&self) -> u8 {
+    pub fn get_id(self) -> u8 {
         self.0 & 0b0011_1111
     }
 
     /// Return if the associated frame uses the classic checksum (diagnostic IDs 60 and 61 or
     /// special use IDs 62, 63)
-    pub fn uses_classic_checksum(&self) -> bool {
+    pub fn uses_classic_checksum(self) -> bool {
         self.get_id() >= 60
     }
 }
@@ -52,8 +49,8 @@ impl PID {
 /// carry. Eight bit sum with carry is equivalent to sum all values and subtract 255 every time the
 /// sum is greater or equal to 256"
 pub fn checksum(pid: PID, data: &[u8]) -> u8 {
-    let sum = data.iter().fold(pid.0 as u16, |sum, v| {
-        let sum = sum + *v as u16;
+    let sum = data.iter().fold(u16::from(pid.0), |sum, v| {
+        let sum = sum + u16::from(*v);
         if sum >= 256 {
             sum - 255
         } else {

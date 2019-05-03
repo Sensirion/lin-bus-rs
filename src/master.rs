@@ -97,8 +97,8 @@ where
         assert!(data_length <= 8, "Maximum data length is 8 bytes");
         self.send_header(pid)?;
         let mut frame = Frame {
-            pid: pid,
-            data_length: data_length,
+            pid,
+            data_length,
             buffer: [0u8; 9],
         };
         self.read(&mut frame.buffer[0..=data_length])?;
