@@ -4,6 +4,9 @@ This project follows [semantic versioning](https://semver.org/).
 
 ## [Unreleased]
 
+ * fixed: Decoding of frame which uses last bit
+   ([#15](https://github.com/Sensirion/lin-bus-rs/pull/15))
+
 ## [0.2.0] (2019-04-18)
 
  * changed: Use Rust 2018 edition syntax
