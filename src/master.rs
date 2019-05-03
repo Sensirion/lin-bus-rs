@@ -53,7 +53,7 @@ impl Frame {
         u64: BitRange<T>,
     {
         assert!(
-            (offset + length) < self.data_length * 8,
+            (offset + length) <= self.data_length * 8,
             "Not enough data available"
         );
         assert!(length <= size_of::<T>() * 8, "Output type not big enough");
@@ -165,5 +165,11 @@ mod tests {
             assert_eq!(d.0.decode::<u16>(10, 10), d.1[1]);
             assert_eq!(d.0.decode::<u16>(20, 11), d.1[2]);
         }
+    }
+
+    #[test]
+    fn test_data_decode_all_bits() {
+        let frame = Frame::from_data(PID(0), &[0x55, 0xDD]);
+        assert_eq!(frame.decode::<u16>(0, 16), 0xdd55);
     }
 }
