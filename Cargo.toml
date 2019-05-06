@@ -1,6 +1,6 @@
 [package]
 name = "lin-bus"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Raphael Nestler <raphael.nestler@sensirion.com>"]
 description = "LIN bus driver traits and protocol implementation"
 readme = "README.md"
