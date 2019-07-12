@@ -4,6 +4,9 @@ This project follows [semantic versioning](https://semver.org/).
 
 ## [Unreleased]
 
+ * changed: Declare some functions as `const fn`
+   ([#15](https://github.com/Sensirion/lin-bus-rs/pull/19))
+
 ## [0.2.1] (2019-05-06)
 
  * fixed: Decoding of frame which uses last bit
