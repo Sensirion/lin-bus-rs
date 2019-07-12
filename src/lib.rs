@@ -29,18 +29,18 @@ impl PID {
     }
 
     /// Return the contained PID
-    pub fn get(self) -> u8 {
+    pub const fn get(self) -> u8 {
         self.0
     }
 
     /// Return the contained ID
-    pub fn get_id(self) -> u8 {
+    pub const fn get_id(self) -> u8 {
         self.0 & 0b0011_1111
     }
 
     /// Return if the associated frame uses the classic checksum (diagnostic IDs 60 and 61 or
     /// special use IDs 62, 63)
-    pub fn uses_classic_checksum(self) -> bool {
+    pub const fn uses_classic_checksum(self) -> bool {
         self.get_id() >= 60
     }
 }
