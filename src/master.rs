@@ -1,81 +1,14 @@
 ///! LIN bus master implementation
 use crate::driver;
+use crate::frame::Frame;
 use crate::PID;
 use crate::{checksum, classic_checksum};
-use bitfield::BitRange;
-use byteorder::{ByteOrder, LittleEndian};
-use core::mem::size_of;
-use num_traits::{PrimInt, Unsigned};
 
 pub trait Master {
     type Error;
     fn send_wakeup(&mut self) -> Result<(), Self::Error>;
     fn write_frame(&mut self, frame: &Frame) -> Result<(), Self::Error>;
     fn read_frame(&mut self, pid: PID, data_lengh: usize) -> Result<Frame, Self::Error>;
-}
-
-#[derive(Debug, Eq, PartialEq)]
-pub struct Frame {
-    pid: PID,
-    buffer: [u8; 9],
-    data_length: usize,
-}
-
-impl Frame {
-    /// Creates a LIN frame from the PID and data. Calculates and adds checksum accordingly
-    pub fn from_data(pid: PID, data: &[u8]) -> Frame {
-        assert!(data.len() <= 8, "Maximum data is 8 bytes");
-        let mut buffer = [0u8; 9];
-        buffer[0..data.len()].clone_from_slice(data);
-        buffer[data.len()] = {
-            if pid.uses_classic_checksum() {
-                classic_checksum(&buffer[0..data.len()])
-            } else {
-                checksum(pid, &buffer[0..data.len()])
-            }
-        };
-        Frame {
-            pid,
-            buffer,
-            data_length: data.len(),
-        }
-    }
-
-    /// Access the data from the frame
-    pub fn get_data(&self) -> &[u8] {
-        &self.buffer[0..self.data_length]
-    }
-
-    /// Decode frame data
-    pub fn decode<T>(&self, offset: usize, length: usize) -> T
-    where
-        T: PrimInt + Unsigned,
-        u64: BitRange<T>,
-    {
-        assert!(
-            (offset + length) <= self.data_length * 8,
-            "Not enough data available"
-        );
-        assert!(length <= size_of::<T>() * 8, "Output type not big enough");
-
-        let num = LittleEndian::read_u64(&self.buffer[0..8]);
-        num.bit_range(offset + length - 1, offset)
-    }
-
-    /// Get the checksum from the frame
-    pub fn get_checksum(&self) -> u8 {
-        self.buffer[self.data_length]
-    }
-
-    /// Get the PID from the frame
-    pub fn get_pid(&self) -> PID {
-        self.pid
-    }
-
-    /// Get the serialized bytes to write to the driver
-    pub fn get_data_with_checksum(&self) -> &[u8] {
-        &self.buffer[0..=self.data_length]
-    }
 }
 
 impl<Driver> Master for Driver
