@@ -16,6 +16,11 @@ impl PID {
     /// P1 = ¬(ID1 ⊕ ID3 ⊕ ID4 ⊕ ID5)
     pub fn from_id(id: u8) -> PID {
         assert!(id < 64, "ID must be less than 64");
+        PID::from_id_const(id)
+    }
+
+    /// Const implementation of `from_id` which doesn't validate id
+    const fn from_id_const(id: u8) -> PID {
         // count parity bits and check if they are even odd
         let p0 = (id & 0b1_0111).count_ones() as u8 & 0b1;
         let p1 = ((id & 0b11_1010).count_ones() as u8 + 1) & 0b1;
