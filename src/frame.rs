@@ -203,13 +203,69 @@ pub mod transport {
 
 /// Implements the LIN diagnostics methods.
 pub mod diagnostic {
-    use super::PID;
+    use super::transport::{create_single_frame, NAD, SID};
+    use super::{Frame, PID};
 
     pub const MASTER_REQUEST_FRAME_ID: u8 = 0x3C;
     pub const SLAVE_RESPONSE_FRAME_ID: u8 = 0x3D;
 
     pub const MASTER_REQUEST_FRAME_PID: PID = PID::from_id_const(0x3C);
     pub const SLAVE_RESPONSE_FRAME_PID: PID = PID::from_id_const(0x3D);
+
+    pub const READ_BY_IDENTIFIER_SID: SID = SID(0xB2);
+
+    #[repr(u8)]
+    pub enum Identifier {
+        LINProductIdentification,
+        SerialNumber,
+        /// User defined range 32..=63
+        UserDefined(u8),
+        /// Reserved range 2..=31 and 64..=255
+        Reserved(u8),
+    }
+
+    impl From<u8> for Identifier {
+        fn from(byte: u8) -> Identifier {
+            match byte {
+                0 => Identifier::LINProductIdentification,
+                1 => Identifier::SerialNumber,
+                b @ 32..=63 => Identifier::UserDefined(b),
+                b => Identifier::Reserved(b),
+            }
+        }
+    }
+
+    impl From<Identifier> for u8 {
+        fn from(identifier: Identifier) -> u8 {
+            match identifier {
+                Identifier::LINProductIdentification => 0,
+                Identifier::SerialNumber => 1,
+                Identifier::UserDefined(b) => b,
+                Identifier::Reserved(b) => b,
+            }
+        }
+    }
+
+    /// Create a reaad by identifier frame
+    pub fn create_read_by_identifier_frame(
+        nad: NAD,
+        identifier: Identifier,
+        supplier_id: u16,
+        function_id: u16,
+    ) -> Frame {
+        create_single_frame(
+            MASTER_REQUEST_FRAME_PID,
+            nad,
+            READ_BY_IDENTIFIER_SID,
+            &[
+                identifier.into(),
+                (supplier_id & 0xFF) as u8,
+                (supplier_id >> 8) as u8,
+                (function_id & 0xFF) as u8,
+                (function_id >> 8) as u8,
+            ],
+        )
+    }
 }
 
 #[cfg(test)]
@@ -311,6 +367,22 @@ mod tests {
             transport::NAD(0x10),
             transport::SID(0xB2),
             &[0x01, 0xB3, 0x00, 0x01, 0x10],
+        );
+
+        assert_eq!(frame.get_pid(), diagnostic::MASTER_REQUEST_FRAME_PID);
+        assert_eq!(frame.get_data(), LIN_ID_SERIAL_REQ_PAYLOAD);
+        assert_eq!(frame.data_length, 8);
+    }
+
+    #[test]
+    fn test_create_read_by_identifier_frame() {
+        const LIN_ID_SERIAL_REQ_PAYLOAD: &[u8] = &[0x10, 0x06, 0xB2, 0x01, 0xB3, 0x00, 0x01, 0x10];
+
+        let frame = diagnostic::create_read_by_identifier_frame(
+            transport::NAD(0x10),
+            diagnostic::Identifier::SerialNumber,
+            0x00B3,
+            0x1001,
         );
 
         assert_eq!(frame.get_pid(), diagnostic::MASTER_REQUEST_FRAME_PID);
