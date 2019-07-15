@@ -129,6 +129,17 @@ impl Frame {
     }
 }
 
+/// Implements the LIN diagnostics methods.
+pub mod diagnostic {
+    use super::PID;
+
+    pub const MASTER_REQUEST_FRAME_ID: u8 = 0x3C;
+    pub const SLAVE_RESPONSE_FRAME_ID: u8 = 0x3D;
+
+    pub const MASTER_REQUEST_FRAME_PID: PID = PID::from_id_const(0x3C);
+    pub const SLAVE_RESPONSE_FRAME_PID: PID = PID::from_id_const(0x3D);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
