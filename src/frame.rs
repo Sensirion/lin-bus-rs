@@ -365,17 +365,58 @@ mod tests {
 
     #[test]
     fn test_transport_frame() {
-        const LIN_ID_SERIAL_REQ_PAYLOAD: &[u8] = &[0x10, 0x06, 0xB2, 0x01, 0xB3, 0x00, 0x01, 0x10];
-        let frame = transport::create_single_frame(
-            diagnostic::MASTER_REQUEST_FRAME_PID,
-            transport::NAD(0x10),
-            transport::SID(0xB2),
-            &[0x01, 0xB3, 0x00, 0x01, 0x10],
-        );
+        struct TestData {
+            pid: PID,
+            nad: transport::NAD,
+            sid: transport::SID,
+            data: &'static [u8],
+            frame_data: [u8; 8],
+        }
+        let test_data = [
+            TestData {
+                pid: diagnostic::MASTER_REQUEST_FRAME_PID,
+                nad: transport::NAD(0x10),
+                sid: transport::SID(0xB2),
+                data: &[0x01, 0xB3, 0x00, 0x01, 0x10],
+                frame_data: [0x10, 0x06, 0xB2, 0x01, 0xB3, 0x00, 0x01, 0x10],
+            },
+            TestData {
+                pid: diagnostic::SLAVE_RESPONSE_FRAME_PID,
+                nad: transport::NAD(0x10),
+                sid: transport::SID(0xB2),
+                data: &[0x01],
+                frame_data: [0x10, 0x02, 0xB2, 0x01, 0xFF, 0xFF, 0xFF, 0xFF],
+            },
+        ];
 
-        assert_eq!(frame.get_pid(), diagnostic::MASTER_REQUEST_FRAME_PID);
-        assert_eq!(frame.get_data(), LIN_ID_SERIAL_REQ_PAYLOAD);
-        assert_eq!(frame.data_length, 8);
+        for d in &test_data {
+            let frame = transport::create_single_frame(d.pid, d.nad, d.sid, d.data);
+            assert_eq!(frame.get_pid(), d.pid);
+            assert_eq!(frame.get_data(), d.frame_data);
+            assert_eq!(frame.data_length, 8);
+        }
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_transport_frame_without_data() {
+        transport::create_single_frame(
+            PID::from_id(0x1),
+            transport::NAD(0x2),
+            transport::SID(0x03),
+            &[],
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_transport_frame_with_too_much_data() {
+        transport::create_single_frame(
+            PID::from_id(0x1),
+            transport::NAD(0x2),
+            transport::SID(0x03),
+            &[1, 2, 3, 4, 5, 6],
+        );
     }
 
     #[test]
