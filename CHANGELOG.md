@@ -5,7 +5,11 @@ This project follows [semantic versioning](https://semver.org/).
 ## [Unreleased]
 
  * changed: Declare some functions as `const fn`
-   ([#15](https://github.com/Sensirion/lin-bus-rs/pull/19))
+   ([#19](https://github.com/Sensirion/lin-bus-rs/pull/19))
+ * changed: Moved `PID` and `Frame` into separat module
+   ([#20](https://github.com/Sensirion/lin-bus-rs/pull/20))
+ * added: Support for transport layer and diagnostic frames
+   ([#20](https://github.com/Sensirion/lin-bus-rs/pull/20))
 
 ## [0.2.1] (2019-05-06)
 
