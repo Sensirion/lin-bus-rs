@@ -136,11 +136,13 @@ pub mod transport {
 
     /// NAD is the address of the slave node being addressed in a request, i.e. only slave nodes
     /// have an address. NAD is also used to indicate the source of a response.
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
     #[repr(transparent)]
     pub struct NAD(pub u8);
 
     /// The PCI (Protocol Control Information) contains the transport layer flow control
     /// information.
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
     #[repr(transparent)]
     pub struct PCI(u8);
 
@@ -178,11 +180,13 @@ pub mod transport {
 
     /// The Service Identifier (SID) specifies the request that shall be performed by the slave
     /// node addressed.
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
     #[repr(transparent)]
     pub struct SID(pub u8);
 
-    #[repr(transparent)]
     /// The Response Service Identifier (RSID) specifies the contents of the response.
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+    #[repr(transparent)]
     pub struct RSID(pub u8);
 
     /// Create a single frame (CF) PDU
