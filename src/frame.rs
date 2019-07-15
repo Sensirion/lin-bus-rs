@@ -129,6 +129,78 @@ impl Frame {
     }
 }
 
+/// Implements the transport layer of LIN. The units that are transported in a transport layer
+/// frame are called PDU (Packet Data Unit)
+pub mod transport {
+    use super::{Frame, PID};
+
+    /// NAD is the address of the slave node being addressed in a request, i.e. only slave nodes
+    /// have an address. NAD is also used to indicate the source of a response.
+    #[repr(transparent)]
+    pub struct NAD(pub u8);
+
+    /// The PCI (Protocol Control Information) contains the transport layer flow control
+    /// information.
+    #[repr(transparent)]
+    pub struct PCI(u8);
+
+    /// Type of the `PCI` byte
+    pub enum PCIType {
+        /// Single Frame
+        SF = 0,
+        /// First Frame. Start of a multi frame message.
+        FF = 1,
+        /// Consecutive Frame.
+        CF = 2,
+        /// Invalid PCIType
+        Invalid,
+    }
+
+    impl PCI {
+        pub fn new_sf(length: u8) -> PCI {
+            assert!(length <= 5, "Maximum length for single frame is 5");
+            PCI(length + 1)
+        }
+
+        pub fn get_type(self) -> PCIType {
+            match self.0 >> 4 {
+                0 => PCIType::SF,
+                1 => PCIType::FF,
+                2 => PCIType::CF,
+                _ => PCIType::Invalid,
+            }
+        }
+
+        pub const fn get_length(self) -> u8 {
+            self.0
+        }
+    }
+
+    /// The Service Identifier (SID) specifies the request that shall be performed by the slave
+    /// node addressed.
+    #[repr(transparent)]
+    pub struct SID(pub u8);
+
+    #[repr(transparent)]
+    /// The Response Service Identifier (RSID) specifies the contents of the response.
+    pub struct RSID(pub u8);
+
+    /// Create a single frame (CF) PDU
+    pub fn create_single_frame(pid: PID, nad: NAD, sid: SID, data: &[u8]) -> Frame {
+        assert!(
+            !data.is_empty() && data.len() <= 5,
+            "A single frame must contain between 0 and 5 bytes"
+        );
+        // If a PDU is not completely filled the unused bytes shall be filled with 0xFF.
+        let mut frame_data = [0xFFu8; 8];
+        frame_data[0] = nad.0;
+        frame_data[1] = PCI::new_sf(data.len() as u8).0;
+        frame_data[2] = sid.0;
+        frame_data[3..data.len() + 3].clone_from_slice(data);
+        Frame::from_data(pid, &frame_data)
+    }
+}
+
 /// Implements the LIN diagnostics methods.
 pub mod diagnostic {
     use super::PID;
@@ -229,5 +301,20 @@ mod tests {
     #[should_panic]
     fn test_pid_from_id_panic() {
         PID::from_id(64);
+    }
+
+    #[test]
+    fn test_transport_frame() {
+        const LIN_ID_SERIAL_REQ_PAYLOAD: &[u8] = &[0x10, 0x06, 0xB2, 0x01, 0xB3, 0x00, 0x01, 0x10];
+        let frame = transport::create_single_frame(
+            diagnostic::MASTER_REQUEST_FRAME_PID,
+            transport::NAD(0x10),
+            transport::SID(0xB2),
+            &[0x01, 0xB3, 0x00, 0x01, 0x10],
+        );
+
+        assert_eq!(frame.get_pid(), diagnostic::MASTER_REQUEST_FRAME_PID);
+        assert_eq!(frame.get_data(), LIN_ID_SERIAL_REQ_PAYLOAD);
+        assert_eq!(frame.data_length, 8);
     }
 }
