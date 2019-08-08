@@ -250,7 +250,7 @@ pub mod diagnostic {
         }
     }
 
-    /// Create a reaad by identifier frame
+    /// Create a read by identifier frame
     pub fn create_read_by_identifier_frame(
         nad: NAD,
         identifier: Identifier,
