@@ -250,6 +250,28 @@ pub mod diagnostic {
         }
     }
 
+    /// Holds the most important node attributes
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+    pub struct NodeAttributes {
+        pub initial_nad: NAD,
+        pub supplier_id: u16,
+        pub function_id: u16,
+        pub variant: u8,
+    }
+
+    /// Create a read by identifier `Frame` from `NodeAttributes`
+    pub fn create_read_by_identifier_frame_from_node_attributes(
+        node_attributes: NodeAttributes,
+        identifier: Identifier,
+    ) -> Frame {
+        create_read_by_identifier_frame(
+            node_attributes.initial_nad,
+            identifier,
+            node_attributes.supplier_id,
+            node_attributes.function_id,
+        )
+    }
+
     /// Create a read by identifier frame
     pub fn create_read_by_identifier_frame(
         nad: NAD,
