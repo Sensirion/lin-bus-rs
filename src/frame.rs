@@ -334,6 +334,7 @@ pub mod diagnostic {
 
 #[cfg(test)]
 mod tests {
+    use super::diagnostic::*;
     use super::*;
 
     struct CheckSumTestData<'a> {
@@ -515,5 +516,24 @@ mod tests {
         assert_eq!(frame.get_pid(), diagnostic::MASTER_REQUEST_FRAME_PID);
         assert_eq!(frame.get_data(), LIN_ID_SERIAL_REQ_PAYLOAD);
         assert_eq!(frame.data_length, 8);
+    }
+
+    #[test]
+    fn test_decode_product_id() {
+        let product_id = ProductId {
+            supplier_id: 0x00B3,
+            function_id: 0x1001,
+            variant: 0x01,
+        };
+        let data = [0xB3, 0x00, 0x01, 0x10, 0x01];
+
+        assert_eq!(product_id, ProductId::from(&data[..]));
+    }
+
+    #[test]
+    fn test_decode_serial_number() {
+        let serial_number = SerialNumber(190200009);
+        let data = [0xC9, 0x38, 0x56, 0x0B];
+        assert_eq!(serial_number, SerialNumber::from(&data[..]));
     }
 }
