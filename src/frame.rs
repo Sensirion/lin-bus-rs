@@ -209,7 +209,7 @@ pub mod transport {
 /// Implements the LIN diagnostics methods.
 pub mod diagnostic {
     use super::transport::{create_single_frame, NAD, SID};
-    use super::{Frame, PID};
+    use super::{ByteOrder, Frame, LittleEndian, PID};
 
     pub const MASTER_REQUEST_FRAME_ID: u8 = 0x3C;
     pub const SLAVE_RESPONSE_FRAME_ID: u8 = 0x3D;
@@ -257,6 +257,17 @@ pub mod diagnostic {
         pub supplier_id: u16,
         pub function_id: u16,
         pub variant: u8,
+    }
+
+    impl From<&[u8]> for ProductId {
+        fn from(data: &[u8]) -> ProductId {
+            assert!(data.len() >= 5, "We require at least 4 data bytes");
+            ProductId {
+                supplier_id: LittleEndian::read_u16(&data[0..2]),
+                function_id: LittleEndian::read_u16(&data[2..4]),
+                variant: data[4],
+            }
+        }
     }
 
     /// Create a read by identifier `Frame` from `NodeAttributes`
