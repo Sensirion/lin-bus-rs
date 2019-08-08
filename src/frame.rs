@@ -270,6 +270,17 @@ pub mod diagnostic {
         }
     }
 
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+    #[repr(transparent)]
+    pub struct SerialNumber(pub u32);
+
+    impl From<&[u8]> for SerialNumber {
+        fn from(data: &[u8]) -> SerialNumber {
+            assert!(data.len() >= 4, "We require at least 4 data bytes");
+            SerialNumber(LittleEndian::read_u32(data))
+        }
+    }
+
     /// Create a read by identifier `Frame` from `NodeAttributes`
     pub fn create_read_by_identifier_frame_from_node_attributes(
         node_attributes: super::NodeAttributes,
