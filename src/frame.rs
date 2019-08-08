@@ -251,6 +251,14 @@ pub mod diagnostic {
         }
     }
 
+    /// Holds the LIN slave node product identification
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+    pub struct ProductId {
+        pub supplier_id: u16,
+        pub function_id: u16,
+        pub variant: u8,
+    }
+
     /// Create a read by identifier `Frame` from `NodeAttributes`
     pub fn create_read_by_identifier_frame_from_node_attributes(
         node_attributes: super::NodeAttributes,
@@ -451,13 +459,11 @@ mod tests {
 
     #[test]
     fn test_create_read_by_identifier_frame_from_node_attributes() {
-        use crate::ldf::ProductId;
-
         const LIN_ID_SERIAL_REQ_PAYLOAD: &[u8] = &[0x10, 0x06, 0xB2, 0x01, 0xB3, 0x00, 0x01, 0x10];
         let node_attributes = NodeAttributes::with_default_timing(
             transport::NAD(0x10),
             transport::NAD(0x10),
-            ProductId {
+            diagnostic::ProductId {
                 supplier_id: 0x00B3,
                 function_id: 0x1001,
                 variant: 0x00,
