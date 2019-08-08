@@ -5,6 +5,7 @@ This project follows [semantic versioning](https://semver.org/).
 ## [Unreleased]
 
  * added: `NodeAttributes` struct and helper functions
+ * added: `SerialNumber` and `ProductId` definitions and decode support
 
 ## [0.3.0] (2019-07-15)
 
