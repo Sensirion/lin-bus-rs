@@ -314,6 +314,22 @@ pub mod diagnostic {
             ],
         )
     }
+
+    pub fn create_read_lin_product_identification_frame(
+        node_attributes: super::NodeAttributes,
+    ) -> Frame {
+        create_read_by_identifier_frame_from_node_attributes(
+            node_attributes,
+            Identifier::LINProductIdentification,
+        )
+    }
+
+    pub fn create_read_serial_number_frame(node_attributes: super::NodeAttributes) -> Frame {
+        create_read_by_identifier_frame_from_node_attributes(
+            node_attributes,
+            Identifier::SerialNumber,
+        )
+    }
 }
 
 #[cfg(test)]
