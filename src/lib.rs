@@ -2,6 +2,7 @@
 
 pub mod driver;
 pub mod frame;
+pub mod ldf;
 pub mod master;
 
 pub use crate::frame::{checksum, classic_checksum, Frame, PID};

@@ -1,5 +1,6 @@
 //! LIN bus frame definitions
 
+use crate::ldf::NodeAttributes;
 use bitfield::BitRange;
 use byteorder::{ByteOrder, LittleEndian};
 use core::mem::size_of;
@@ -250,7 +251,20 @@ pub mod diagnostic {
         }
     }
 
-    /// Create a reaad by identifier frame
+    /// Create a read by identifier `Frame` from `NodeAttributes`
+    pub fn create_read_by_identifier_frame_from_node_attributes(
+        node_attributes: super::NodeAttributes,
+        identifier: Identifier,
+    ) -> Frame {
+        create_read_by_identifier_frame(
+            node_attributes.initial_nad,
+            identifier,
+            node_attributes.product_id.supplier_id,
+            node_attributes.product_id.function_id,
+        )
+    }
+
+    /// Create a read by identifier frame
     pub fn create_read_by_identifier_frame(
         nad: NAD,
         identifier: Identifier,
@@ -430,6 +444,30 @@ mod tests {
             0x1001,
         );
 
+        assert_eq!(frame.get_pid(), diagnostic::MASTER_REQUEST_FRAME_PID);
+        assert_eq!(frame.get_data(), LIN_ID_SERIAL_REQ_PAYLOAD);
+        assert_eq!(frame.data_length, 8);
+    }
+
+    #[test]
+    fn test_create_read_by_identifier_frame_from_node_attributes() {
+        use crate::ldf::ProductId;
+
+        const LIN_ID_SERIAL_REQ_PAYLOAD: &[u8] = &[0x10, 0x06, 0xB2, 0x01, 0xB3, 0x00, 0x01, 0x10];
+        let node_attributes = NodeAttributes::with_default_timing(
+            transport::NAD(0x10),
+            transport::NAD(0x10),
+            ProductId {
+                supplier_id: 0x00B3,
+                function_id: 0x1001,
+                variant: 0x00,
+            },
+        );
+
+        let frame = diagnostic::create_read_by_identifier_frame_from_node_attributes(
+            node_attributes,
+            diagnostic::Identifier::SerialNumber,
+        );
         assert_eq!(frame.get_pid(), diagnostic::MASTER_REQUEST_FRAME_PID);
         assert_eq!(frame.get_data(), LIN_ID_SERIAL_REQ_PAYLOAD);
         assert_eq!(frame.data_length, 8);

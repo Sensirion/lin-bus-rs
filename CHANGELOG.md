@@ -4,6 +4,8 @@ This project follows [semantic versioning](https://semver.org/).
 
 ## [Unreleased]
 
+ * added: `NodeAttributes` struct and helper functions
+
 ## [0.3.0] (2019-07-15)
 
  * changed: Declare some functions as `const fn`
