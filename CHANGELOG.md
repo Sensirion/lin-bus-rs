@@ -6,6 +6,7 @@ This project follows [semantic versioning](https://semver.org/).
 
  * added: `NodeAttributes` struct and helper functions
  * added: `SerialNumber` and `ProductId` definitions and decode support
+ * fixed: Bug in `PCI::get_length` where the length would be returned wrong
 
 ## [0.3.0] (2019-07-15)
 
