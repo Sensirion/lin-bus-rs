@@ -163,8 +163,8 @@ pub mod transport {
     impl PCI {
         /// Create a `PCI` with type `PCIType::SF` and the given length
         pub fn new_sf(length: u8) -> PCI {
-            assert!(length <= 5, "Maximum length for single frame is 5");
-            PCI(length + 1)
+            assert!(length <= 6, "Maximum length for single frame is 6");
+            PCI(length)
         }
 
         /// Get the `PCIType` of the PCI
@@ -179,7 +179,7 @@ pub mod transport {
 
         /// Get the length field of the `PCI`
         pub const fn get_length(self) -> u8 {
-            self.0
+            self.0 & 0x0F
         }
     }
 
@@ -203,7 +203,7 @@ pub mod transport {
         // If a PDU is not completely filled the unused bytes shall be filled with 0xFF.
         let mut frame_data = [0xFFu8; 8];
         frame_data[0] = nad.0;
-        frame_data[1] = PCI::new_sf(data.len() as u8).0;
+        frame_data[1] = PCI::new_sf(data.len() as u8 + 1).0;
         frame_data[2] = sid.0;
         frame_data[3..data.len() + 3].clone_from_slice(data);
         Frame::from_data(pid, &frame_data)
