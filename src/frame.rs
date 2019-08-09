@@ -160,11 +160,13 @@ pub mod transport {
     }
 
     impl PCI {
+        /// Create a `PCI` with type `PCIType::SF` and the given length
         pub fn new_sf(length: u8) -> PCI {
             assert!(length <= 5, "Maximum length for single frame is 5");
             PCI(length + 1)
         }
 
+        /// Get the `PCIType` of the PCI
         pub fn get_type(self) -> PCIType {
             match self.0 >> 4 {
                 0 => PCIType::SF,
@@ -174,6 +176,7 @@ pub mod transport {
             }
         }
 
+        /// Get the length field of the `PCI`
         pub const fn get_length(self) -> u8 {
             self.0
         }
@@ -220,8 +223,11 @@ pub mod diagnostic {
     pub const READ_BY_IDENTIFIER_SID: SID = SID(0xB2);
 
     #[repr(u8)]
+    /// Identifiers used for the Read by identifer
     pub enum Identifier {
+        /// See also `ProductId`
         LINProductIdentification,
+        /// See also `SerialNumber`
         SerialNumber,
         /// User defined range 32..=63
         UserDefined(u8),
