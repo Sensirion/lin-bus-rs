@@ -4,9 +4,14 @@ This project follows [semantic versioning](https://semver.org/).
 
 ## [Unreleased]
 
- * added: `NodeAttributes` struct and helper functions
+## [0.3.1] (2019-08-09)
+
+ * added: `NodeAttributes` struct and helper functions to generate diagnostic
+   frames  from it. ([#23](https://github.com/Sensirion/lin-bus-rs/pull/23))
  * added: `SerialNumber` and `ProductId` definitions and decode support
+   ([#24](https://github.com/Sensirion/lin-bus-rs/pull/24))
  * fixed: Bug in `PCI::get_length` where the length would be returned wrong
+   ([#26](https://github.com/Sensirion/lin-bus-rs/pull/26))
 
 ## [0.3.0] (2019-07-15)
 
@@ -38,7 +43,8 @@ This project follows [semantic versioning](https://semver.org/).
 
  * First crates.io release
 
-[Unreleased]: https://github.com/Sensirion/lin-bus-rs/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Sensirion/lin-bus-rs/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/Sensirion/lin-bus-rs/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Sensirion/lin-bus-rs/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/Sensirion/lin-bus-rs/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Sensirion/lin-bus-rs/compare/v0.1.1...v0.2.0
