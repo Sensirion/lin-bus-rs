@@ -1,14 +1,7 @@
 //! Contains structs representing data of the LDF file
 
+use crate::frame::diagnostic::ProductId;
 use crate::frame::transport::NAD;
-
-/// Holds the LIN slave node product identification
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub struct ProductId {
-    pub supplier_id: u16,
-    pub function_id: u16,
-    pub variant: u8,
-}
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 #[repr(transparent)]

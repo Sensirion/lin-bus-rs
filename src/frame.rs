@@ -209,7 +209,7 @@ pub mod transport {
 /// Implements the LIN diagnostics methods.
 pub mod diagnostic {
     use super::transport::{create_single_frame, NAD, SID};
-    use super::{Frame, PID};
+    use super::{ByteOrder, Frame, LittleEndian, PID};
 
     pub const MASTER_REQUEST_FRAME_ID: u8 = 0x3C;
     pub const SLAVE_RESPONSE_FRAME_ID: u8 = 0x3D;
@@ -251,6 +251,36 @@ pub mod diagnostic {
         }
     }
 
+    /// Holds the LIN slave node product identification
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+    pub struct ProductId {
+        pub supplier_id: u16,
+        pub function_id: u16,
+        pub variant: u8,
+    }
+
+    impl From<&[u8]> for ProductId {
+        fn from(data: &[u8]) -> ProductId {
+            assert!(data.len() >= 5, "We require at least 4 data bytes");
+            ProductId {
+                supplier_id: LittleEndian::read_u16(&data[0..2]),
+                function_id: LittleEndian::read_u16(&data[2..4]),
+                variant: data[4],
+            }
+        }
+    }
+
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
+    #[repr(transparent)]
+    pub struct SerialNumber(pub u32);
+
+    impl From<&[u8]> for SerialNumber {
+        fn from(data: &[u8]) -> SerialNumber {
+            assert!(data.len() >= 4, "We require at least 4 data bytes");
+            SerialNumber(LittleEndian::read_u32(data))
+        }
+    }
+
     /// Create a read by identifier `Frame` from `NodeAttributes`
     pub fn create_read_by_identifier_frame_from_node_attributes(
         node_attributes: super::NodeAttributes,
@@ -284,10 +314,27 @@ pub mod diagnostic {
             ],
         )
     }
+
+    pub fn create_read_lin_product_identification_frame(
+        node_attributes: super::NodeAttributes,
+    ) -> Frame {
+        create_read_by_identifier_frame_from_node_attributes(
+            node_attributes,
+            Identifier::LINProductIdentification,
+        )
+    }
+
+    pub fn create_read_serial_number_frame(node_attributes: super::NodeAttributes) -> Frame {
+        create_read_by_identifier_frame_from_node_attributes(
+            node_attributes,
+            Identifier::SerialNumber,
+        )
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use super::diagnostic::*;
     use super::*;
 
     struct CheckSumTestData<'a> {
@@ -451,13 +498,11 @@ mod tests {
 
     #[test]
     fn test_create_read_by_identifier_frame_from_node_attributes() {
-        use crate::ldf::ProductId;
-
         const LIN_ID_SERIAL_REQ_PAYLOAD: &[u8] = &[0x10, 0x06, 0xB2, 0x01, 0xB3, 0x00, 0x01, 0x10];
         let node_attributes = NodeAttributes::with_default_timing(
             transport::NAD(0x10),
             transport::NAD(0x10),
-            ProductId {
+            diagnostic::ProductId {
                 supplier_id: 0x00B3,
                 function_id: 0x1001,
                 variant: 0x00,
@@ -471,5 +516,24 @@ mod tests {
         assert_eq!(frame.get_pid(), diagnostic::MASTER_REQUEST_FRAME_PID);
         assert_eq!(frame.get_data(), LIN_ID_SERIAL_REQ_PAYLOAD);
         assert_eq!(frame.data_length, 8);
+    }
+
+    #[test]
+    fn test_decode_product_id() {
+        let product_id = ProductId {
+            supplier_id: 0x00B3,
+            function_id: 0x1001,
+            variant: 0x01,
+        };
+        let data = [0xB3, 0x00, 0x01, 0x10, 0x01];
+
+        assert_eq!(product_id, ProductId::from(&data[..]));
+    }
+
+    #[test]
+    fn test_decode_serial_number() {
+        let serial_number = SerialNumber(190200009);
+        let data = [0xC9, 0x38, 0x56, 0x0B];
+        assert_eq!(serial_number, SerialNumber::from(&data[..]));
     }
 }
