@@ -1,4 +1,4 @@
-///! LIN bus master implementation
+//! LIN bus master implementation
 use crate::driver;
 use crate::frame::Frame;
 use crate::PID;
