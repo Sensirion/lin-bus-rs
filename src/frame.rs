@@ -148,6 +148,7 @@ pub mod transport {
     pub struct PCI(u8);
 
     /// Type of the `PCI` byte
+    #[derive(Copy, Clone, Debug, PartialEq, Eq)]
     pub enum PCIType {
         /// Single Frame
         SF = 0,
@@ -341,6 +342,7 @@ pub mod diagnostic {
 #[cfg(test)]
 mod tests {
     use super::diagnostic::*;
+    use super::transport::*;
     use super::*;
 
     struct CheckSumTestData<'a> {
@@ -428,6 +430,13 @@ mod tests {
     #[should_panic]
     fn test_pid_from_id_panic() {
         PID::from_id(64);
+    }
+
+    #[test]
+    fn test_pci() {
+        let pci = PCI::new_sf(5);
+        assert_eq!(pci.get_type(), PCIType::SF);
+        assert_eq!(pci.get_length(), 5);
     }
 
     #[test]
