@@ -1,4 +1,4 @@
-///! Trait for a hardware driver to implement
+//! Trait for a hardware driver to implement
 pub use crate::Error;
 use crate::PID;
 
