@@ -12,6 +12,11 @@ use num_traits::{PrimInt, Unsigned};
 pub struct PID(pub(crate) u8);
 
 impl PID {
+    /// Creates a new PID object with given PID
+    pub fn new(pid: u8) -> PID {
+        PID(pid)
+    }
+
     /// Calculate the PID from an ID.
     /// P0 = ID0 ⊕ ID1 ⊕ ID2 ⊕ ID4
     /// P1 = ¬(ID1 ⊕ ID3 ⊕ ID4 ⊕ ID5)
@@ -396,6 +401,22 @@ mod tests {
         ];
         for d in &test_data {
             assert_eq!(d.checksum, classic_checksum(d.data));
+        }
+    }
+
+    #[test]
+    fn test_pid_new() {
+        let test_data = [
+            (0x0, PID(0x00)),
+            (0x1, PID(0x01)),
+            (0x2, PID(0x02)),
+            (0x25, PID(0x25)),
+            (0x32, PID(0x32)),
+            (0x38, PID(0x38))
+        ];
+
+        for d in &test_data {
+            assert_eq!(d.0, d.1.get());
         }
     }
 
