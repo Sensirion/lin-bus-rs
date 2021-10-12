@@ -14,7 +14,10 @@ pub struct PID(pub(crate) u8);
 impl PID {
     /// Creates a new PID object with given PID
     pub fn new(pid: u8) -> PID {
-        PID(pid)
+        // check that the given PID has valid parity bits
+        let correct_pid = PID::from_id_const(pid & 0b0011_1111);
+        assert!(correct_pid.0 == pid, "Invalid PID");
+        correct_pid
     }
 
     /// Calculate the PID from an ID.
@@ -407,12 +410,12 @@ mod tests {
     #[test]
     fn test_pid_new() {
         let test_data = [
-            (0x0, PID(0x00)),
-            (0x1, PID(0x01)),
-            (0x2, PID(0x02)),
-            (0x25, PID(0x25)),
-            (0x32, PID(0x32)),
-            (0x38, PID(0x38))
+            (0x64, PID::new(0x64)),
+            (0xCA, PID::new(0xCA)),
+            (0x80, PID::new(0x80)),
+            (0xC1, PID::new(0xC1)),
+            (0x47, PID::new(0x47)),
+            (0x61, PID::new(0x61)),
         ];
 
         for d in &test_data {
