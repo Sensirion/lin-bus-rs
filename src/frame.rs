@@ -424,6 +424,12 @@ mod tests {
     }
 
     #[test]
+    #[should_panic]
+    fn test_invalid_pid_new() {
+        PID::new(0x07);
+    }
+
+    #[test]
     fn test_pid_from_id() {
         let test_data = [
             (0, PID(0x80)),
