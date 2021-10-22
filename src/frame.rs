@@ -9,7 +9,7 @@ use num_traits::{PrimInt, Unsigned};
 /// Protected ID which is a 6 bit ID with two parity bits
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(transparent)]
-pub struct PID(pub(crate) u8);
+pub struct PID(u8);
 
 impl PID {
     /// Creates a new PID object with given PID
