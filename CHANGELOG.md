@@ -4,6 +4,9 @@ This project follows [semantic versioning](https://semver.org/).
 
 ## [Unreleased]
 
+ * added: `PID::new` to construct PID's with a known value
+   ([#31](https://github.com/Sensirion/lin-bus-rs/pull/31))
+
 ## [0.3.1] (2019-08-09)
 
  * added: `NodeAttributes` struct and helper functions to generate diagnostic

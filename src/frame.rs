@@ -9,9 +9,17 @@ use num_traits::{PrimInt, Unsigned};
 /// Protected ID which is a 6 bit ID with two parity bits
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 #[repr(transparent)]
-pub struct PID(pub(crate) u8);
+pub struct PID(u8);
 
 impl PID {
+    /// Creates a new PID object with given PID
+    pub fn new(pid: u8) -> PID {
+        // check that the given PID has valid parity bits
+        let correct_pid = PID::from_id_const(pid & 0b0011_1111);
+        assert!(correct_pid.0 == pid, "Invalid PID");
+        correct_pid
+    }
+
     /// Calculate the PID from an ID.
     /// P0 = ID0 ⊕ ID1 ⊕ ID2 ⊕ ID4
     /// P1 = ¬(ID1 ⊕ ID3 ⊕ ID4 ⊕ ID5)
@@ -397,6 +405,28 @@ mod tests {
         for d in &test_data {
             assert_eq!(d.checksum, classic_checksum(d.data));
         }
+    }
+
+    #[test]
+    fn test_pid_new() {
+        let test_data = [
+            (0x64, PID::new(0x64)),
+            (0xCA, PID::new(0xCA)),
+            (0x80, PID::new(0x80)),
+            (0xC1, PID::new(0xC1)),
+            (0x47, PID::new(0x47)),
+            (0x61, PID::new(0x61)),
+        ];
+
+        for d in &test_data {
+            assert_eq!(d.0, d.1.get());
+        }
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_pid_new() {
+        PID::new(0x07);
     }
 
     #[test]

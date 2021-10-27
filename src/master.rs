@@ -63,10 +63,10 @@ mod tests {
     #[test]
     fn test_frame_from_data() {
         let test_data = [FrameTestData {
-            pid: PID(0xDD),
+            pid: PID::new(0xDD),
             data: &[0x01],
             frame: Frame {
-                pid: PID(0xDD),
+                pid: PID::new(0xDD),
                 buffer: [0x01, 0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
                 data_length: 1,
             },
@@ -84,13 +84,22 @@ mod tests {
     fn test_data_decode() {
         let test_data = [
             (
-                Frame::from_data(PID(0), &[254, 251, 239, 255]),
+                Frame::from_data(PID::new(80), &[254, 251, 239, 255]),
                 [1022, 1022, 2046],
             ),
-            (Frame::from_data(PID(0), &[3, 12, 240, 182]), [3, 3, 879]),
-            (Frame::from_data(PID(0), &[3, 12, 0, 183]), [3, 3, 880]),
-            (Frame::from_data(PID(0), &[2, 12, 240, 182]), [2, 3, 879]),
-            (Frame::from_data(PID(0), &[2, 8, 0, 183]), [2, 2, 880]),
+            (
+                Frame::from_data(PID::new(80), &[3, 12, 240, 182]),
+                [3, 3, 879],
+            ),
+            (
+                Frame::from_data(PID::new(80), &[3, 12, 0, 183]),
+                [3, 3, 880],
+            ),
+            (
+                Frame::from_data(PID::new(80), &[2, 12, 240, 182]),
+                [2, 3, 879],
+            ),
+            (Frame::from_data(PID::new(80), &[2, 8, 0, 183]), [2, 2, 880]),
         ];
 
         for d in &test_data {
@@ -102,7 +111,7 @@ mod tests {
 
     #[test]
     fn test_data_decode_all_bits() {
-        let frame = Frame::from_data(PID(0), &[0x55, 0xDD]);
+        let frame = Frame::from_data(PID::new(80), &[0x55, 0xDD]);
         assert_eq!(frame.decode::<u16>(0, 16), 0xdd55);
     }
 }
