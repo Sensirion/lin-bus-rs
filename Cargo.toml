@@ -1,7 +1,11 @@
 [package]
 name = "lin-bus"
-version = "0.3.1"
-authors = ["Raphael Nestler <raphael.nestler@sensirion.com>"]
+version = "0.3.2"
+authors = [
+    "Raphael Nestler <raphael.nestler@sensirion.com>",
+    "Andreas Brauchli <andreas.brauchli@sensirion.com>",
+    "Niclas Lind <niclas.lind93@gmail.com>",
+]
 description = "LIN bus driver traits and protocol implementation"
 readme = "README.md"
 keywords = ["LIN", "local", "interconnect", "network"]

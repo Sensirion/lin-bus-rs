@@ -2,7 +2,7 @@
 
 This project follows [semantic versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.3.2] (2021-10-28)
 
  * added: `PID::new` to construct PID's with a known value
    ([#31](https://github.com/Sensirion/lin-bus-rs/pull/31))
@@ -46,7 +46,8 @@ This project follows [semantic versioning](https://semver.org/).
 
  * First crates.io release
 
-[Unreleased]: https://github.com/Sensirion/lin-bus-rs/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/Sensirion/lin-bus-rs/compare/v0.3.2...HEAD
+[0.3.1]: https://github.com/Sensirion/lin-bus-rs/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/Sensirion/lin-bus-rs/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/Sensirion/lin-bus-rs/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/Sensirion/lin-bus-rs/compare/v0.2.0...v0.2.1
