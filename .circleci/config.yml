@@ -3,7 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: rust:1.34
+      - image: rust:1.57
     steps:
       - checkout
       - run: rustup component add rustfmt
