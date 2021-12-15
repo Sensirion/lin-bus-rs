@@ -13,9 +13,9 @@ pub struct PID(u8);
 
 impl PID {
     /// Creates a new PID object with given PID
-    pub fn new(pid: u8) -> PID {
+    pub const fn new(pid: u8) -> PID {
         // check that the given PID has valid parity bits
-        let correct_pid = PID::from_id_const(pid & 0b0011_1111);
+        let correct_pid = PID::from_id(pid & 0b0011_1111);
         assert!(correct_pid.0 == pid, "Invalid PID");
         correct_pid
     }
@@ -23,13 +23,8 @@ impl PID {
     /// Calculate the PID from an ID.
     /// P0 = ID0 ⊕ ID1 ⊕ ID2 ⊕ ID4
     /// P1 = ¬(ID1 ⊕ ID3 ⊕ ID4 ⊕ ID5)
-    pub fn from_id(id: u8) -> PID {
+    pub const fn from_id(id: u8) -> PID {
         assert!(id < 64, "ID must be less than 64");
-        PID::from_id_const(id)
-    }
-
-    /// Const implementation of `from_id` which doesn't validate id
-    const fn from_id_const(id: u8) -> PID {
         // count parity bits and check if they are even odd
         let p0 = (id & 0b1_0111).count_ones() as u8 & 0b1;
         let p1 = ((id & 0b11_1010).count_ones() as u8 + 1) & 0b1;
@@ -170,13 +165,13 @@ pub mod transport {
 
     impl PCI {
         /// Create a `PCI` with type `PCIType::SF` and the given length
-        pub fn new_sf(length: u8) -> PCI {
+        pub const fn new_sf(length: u8) -> PCI {
             assert!(length <= 6, "Maximum length for single frame is 6");
             PCI(length)
         }
 
         /// Get the `PCIType` of the PCI
-        pub fn get_type(self) -> PCIType {
+        pub const fn get_type(self) -> PCIType {
             match self.0 >> 4 {
                 0 => PCIType::SF,
                 1 => PCIType::FF,
@@ -226,8 +221,8 @@ pub mod diagnostic {
     pub const MASTER_REQUEST_FRAME_ID: u8 = 0x3C;
     pub const SLAVE_RESPONSE_FRAME_ID: u8 = 0x3D;
 
-    pub const MASTER_REQUEST_FRAME_PID: PID = PID::from_id_const(0x3C);
-    pub const SLAVE_RESPONSE_FRAME_PID: PID = PID::from_id_const(0x3D);
+    pub const MASTER_REQUEST_FRAME_PID: PID = PID::from_id(0x3C);
+    pub const SLAVE_RESPONSE_FRAME_PID: PID = PID::from_id(0x3D);
 
     pub const READ_BY_IDENTIFIER_SID: SID = SID(0xB2);
 

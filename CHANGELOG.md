@@ -2,6 +2,12 @@
 
 This project follows [semantic versioning](https://semver.org/).
 
+## [0.4.0] (Unreleased)
+
+ * changed: `PID::new`, `PID::from_id`, `PCI::new_sf` and `PCI::get_type` are
+   now `const fn`s. ([#33](https://github.com/Sensirion/lin-bus-rs/pull/33))
+ * breaking: Minimal required Rust version changed to 1.57.0
+
 ## [0.3.2] (2021-10-28)
 
  * added: `PID::new` to construct PID's with a known value
