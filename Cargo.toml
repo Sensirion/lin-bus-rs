@@ -12,7 +12,7 @@ keywords = ["LIN", "local", "interconnect", "network"]
 categories = ["no-std", "hardware-support"]
 license = "BSD-3-Clause"
 repository = "https://github.com/Sensirion/lin-bus-rs"
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 bitfield = "^0.13"
