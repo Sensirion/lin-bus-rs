@@ -1,6 +1,10 @@
 //! LIN bus master implementation
 use crate::driver;
+use crate::frame::diagnostic::{
+    create_read_by_identifier_frame_from_node_attributes, Identifier, SLAVE_RESPONSE_FRAME_PID,
+};
 use crate::frame::Frame;
+use crate::ldf::NodeAttributes;
 use crate::PID;
 use crate::{checksum, classic_checksum};
 
@@ -9,6 +13,12 @@ pub trait Master {
     fn send_wakeup(&mut self) -> Result<(), Self::Error>;
     fn write_frame(&mut self, frame: &Frame) -> Result<(), Self::Error>;
     fn read_frame(&mut self, pid: PID, data_lengh: usize) -> Result<Frame, Self::Error>;
+    fn read_by_identifier(
+        &mut self,
+        node_attributes: NodeAttributes,
+        identifier: Identifier,
+        data: &mut [u8],
+    ) -> Result<(), Self::Error>;
 }
 
 impl<Driver> Master for Driver
@@ -48,6 +58,19 @@ where
         } else {
             Ok(frame)
         }
+    }
+
+    fn read_by_identifier(
+        &mut self,
+        node_attributes: NodeAttributes,
+        identifier: Identifier,
+        _data: &mut [u8],
+    ) -> Result<(), Driver::Error> {
+        let request_frame =
+            create_read_by_identifier_frame_from_node_attributes(node_attributes, identifier);
+        self.write_frame(&request_frame)?;
+        let answer_frame = self.read_frame(SLAVE_RESPONSE_FRAME_PID, 8)?;
+        Ok(())
     }
 }
 
