@@ -1,0 +1,25 @@
+name: Check and build rust library
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  check-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stable with rustfmt and clippy
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: 1.57
+          components: rustfmt, clippy
+      - run: cargo fmt -- --check
+      - run: cargo build
+      - run: cargo test
+      - run: cargo clippy -- -D warnings
