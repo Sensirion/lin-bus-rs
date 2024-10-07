@@ -2,6 +2,10 @@
 
 This project follows [semantic versioning](https://semver.org/).
 
+## [Unreleased]
+ * breaking: `Pid::new` returns `Result` instead of asserting in case of an error.
+   ([#37](https://github.com/Sensirion/lin-bus-rs/pull/37))
+
 ## [0.4.0] (2021-12-16)
 
  * changed: `PID::new`, `PID::from_id`, `PCI::new_sf` and `PCI::get_type` are

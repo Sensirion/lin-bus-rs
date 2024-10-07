@@ -13,11 +13,13 @@ pub struct PID(u8);
 
 impl PID {
     /// Creates a new PID object with given PID
-    pub const fn new(pid: u8) -> PID {
-        // check that the given PID has valid parity bits
+    pub const fn new(pid: u8) -> Result<PID, &'static str> {
         let correct_pid = PID::from_id(pid & 0b0011_1111);
-        assert!(correct_pid.0 == pid, "Invalid PID");
-        correct_pid
+        if correct_pid.0 == pid {
+            Ok(correct_pid)
+        } else {
+            Err("Invalid parity bits")
+        }
     }
 
     /// Calculate the PID from an ID.
@@ -414,14 +416,13 @@ mod tests {
         ];
 
         for d in &test_data {
-            assert_eq!(d.0, d.1.get());
+            assert_eq!(d.0, d.1.unwrap().get());
         }
     }
 
     #[test]
-    #[should_panic]
     fn test_invalid_pid_new() {
-        PID::new(0x07);
+        assert_eq!(Err("Invalid parity bits"), PID::new(0x07));
     }
 
     #[test]
